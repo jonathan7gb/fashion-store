@@ -1,3 +1,10 @@
+const params = new URLSearchParams(window.location.search);
+const product_id = params.get("id");
+
+if (product_id) {
+    showProductsDetail(product_id);
+}
+
 function returnURL(path){
     return `https://api.escuelajs.co/api/v1/${path}`
 }
@@ -34,7 +41,7 @@ function show3RecentProducts(){
                             <h3 class="card-title">${element.title}</h3>
                             <div class="card-footer">
                             <span class="card-price">R$ ${element.price}</span>
-                            <a href="./detail.html" class="btn-primary btn-small">Ver Detalhes</a>
+                            <a href="./detail.html?id=${element.id}" class="btn-primary btn-small">Ver Detalhes</a>
                             </div>
                         </div>
                     </article>
@@ -78,7 +85,7 @@ function showAllProducts(){
                             <h3 class="card-title">${element.title}</h3>
                             <div class="card-footer">
                             <span class="card-price">R$ ${element.price}</span>
-                            <a href="./detail.html" class="btn-primary btn-small">Ver Detalhes</a>
+                            <a href="./detail.html?id=${element.id}" class="btn-primary btn-small">Ver Detalhes</a>
                             </div>
                         </div>
                     </article>
@@ -126,8 +133,6 @@ function filterProducts(product_id){
         ? `products?categoryId=${product_id}`
         : `products`; 
         
-
-
     fetch(returnURL(path))
         .then(response => {
             if(!response.ok){
@@ -149,7 +154,7 @@ function filterProducts(product_id){
                             <h3 class="card-title">${element.title}</h3>
                             <div class="card-footer">
                             <span class="card-price">R$ ${element.price}</span>
-                            <a href="./detail.html" class="btn-primary btn-small">Ver Detalhes</a>
+                            <a href="./detail.html?id=${element.id}" class="btn-primary btn-small">Ver Detalhes</a>
                             </div>
                         </div>
                     </article>
@@ -158,6 +163,40 @@ function filterProducts(product_id){
             });
 
             document.getElementById("products-list").innerHTML = cards
+
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}
+
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// DETAIL.HTML
+
+function showProductsDetail(product_id){
+    let path = `products/${product_id}`
+
+    fetch(returnURL(path))
+        .then(response => {
+            if(!response.ok){
+                throw new Error("Erro ao buscar dados!");
+            }
+            return response.json();
+        })
+        .then(data => {
+            let info = `
+                    <img src="./img/nophoto.png" alt="Loading" class="detail-img">
+                    <div class="detail-info">
+                        <span class="card-category" style="font-size:1rem; margin-bottom:1rem; display:block;">Categoria: ${data.category.name}</span>
+                        <h1>${data.title}</h1>
+                        <div class="detail-price">R$ ${data.price}</div>
+                        <p class="detail-description">${data.description}</p>
+                        <button class="btn-primary" disabled>Adicionar ao Carrinho</button>
+                    </div>
+                    `
+            document.getElementById("product-detail").innerHTML = info
 
         })
         .catch(error => {
